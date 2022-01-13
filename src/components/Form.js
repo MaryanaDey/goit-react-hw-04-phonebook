@@ -1,21 +1,29 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
+
 import shortid from 'shortid';
 import s from './Phone.module.css';
 
-export default class Form extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
+export default function Form({ contactList, onSubmit }) {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  InputValue = e => {
+  const InputValue = e => {
     const { name, value } = e.currentTarget;
-    this.setState({ [name]: value });
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'number':
+        setNumber(value);
+        break;
+      default:
+        return;
+    }
   };
 
-  addContact = e => {
-    const lengthInputNameChech = this.state.name.length;
-    const lengthInputNumberChech = this.state.number.length;
+  const addContact = e => {
+    const lengthInputNameChech = name.length;
+    const lengthInputNumberChech = number.length;
 
     e.preventDefault();
     if (lengthInputNameChech < 2 || lengthInputNumberChech > 10) {
@@ -27,66 +35,64 @@ export default class Form extends Component {
       return;
     }
 
-    const checkName = this.props.contactList({ name: this.state.name });
+    const checkName = contactList(name);
     if (checkName) {
       alert('Это имя уже существует');
 
       return;
     }
 
-    this.props.onSubmit({
+    onSubmit({
       id: shortid.generate(),
-      name: this.state.name,
-      number: this.state.number,
+      name,
+      number,
     });
-    this.resetInputvalues();
+    resetInputvalues();
   };
 
-  resetInputvalues = () => {
-    this.setState({ name: '', number: '' });
+  const resetInputvalues = () => {
+    setName('');
+    setNumber('');
   };
 
-  render() {
-    const idName = shortid.generate();
-    const idNumber = shortid.generate();
-    const { name, number } = this.state;
+  const idName = shortid.generate();
+  const idNumber = shortid.generate();
 
-    return (
-      <form className={s.form} onSubmit={this.addContact}>
-        <label htmlFor={idName} className={s.labelName}>
-          Name
-        </label>
+  return (
+    <form className={s.form} onSubmit={addContact}>
+      <label htmlFor={idName} className={s.labelName}>
+        Name
+      </label>
 
-        <input
-          id={idName}
-          type="text"
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          name="name"
-          value={name}
-          placeholder="Name"
-          onChange={this.InputValue}
-          autoComplete="off"
-        />
+      <input
+        id={idName}
+        type="text"
+        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+        name="name"
+        value={name}
+        placeholder="Name"
+        onChange={InputValue}
+        autoComplete="off"
+      />
 
-        <label htmlFor={idNumber} className={s.labelNumber}>
-          Number
-        </label>
+      <label htmlFor={idNumber} className={s.labelNumber}>
+        Number
+      </label>
 
-        <input
-          id={idNumber}
-          type="number"
-          pattern="^[ 0-9]+$"
-          name="number"
-          value={number}
-          placeholder="(0xx) xxx-xx-xx"
-          onChange={this.InputValue}
-          autoComplete="off"
-        />
+      <input
+        id={idNumber}
+        type="number"
+        pattern="^[ 0-9]+$"
+        name="number"
+        value={number}
+        placeholder="(0xx) xxx-xx-xx"
+        onChange={InputValue}
+        autoComplete="off"
+      />
 
-        <button type="submite" className={s.btnForm}>
-          Add contact
-        </button>
-      </form>
-    );
-  }
+      <button type="submite" className={s.btnForm}>
+        Add contact
+      </button>
+    </form>
+  );
 }
